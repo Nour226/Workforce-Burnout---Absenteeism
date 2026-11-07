@@ -61,15 +61,16 @@ WITH p AS (
     SELECT a.employee_id, COUNT(*) AS leave_days
     FROM absences a, win
     WHERE a.absence_type = 'Planned leave'
-      AND a.absence_date >  win.as_of - p_leave_days
-      AND a.absence_date <= win.as_of
+      AND a.start_date >  win.as_of - p_leave_days
+      AND a.start_date <= win.as_of
     GROUP BY a.employee_id
 )
-SELECT s.employee_id, d.dept_name, e.manager_id,
+SELECT s.employee_id, d.dept_name, em.manager_id,
        ROUND(s.avg_h, 1), s.min_h, COALESCE(l.leave_days, 0)::int
 FROM streak s
 JOIN employees   e ON e.employee_id = s.employee_id
 JOIN departments d ON d.dept_id     = e.dept_id
+JOIN employee_managers em ON em.employee_id = s.employee_id
 LEFT JOIN leave  l ON l.employee_id = s.employee_id
 WHERE l.employee_id IS NULL                      -- no leave taken in the window
 $$;
@@ -119,18 +120,19 @@ WITH per AS (
     GROUP BY 1
 ), team AS (
     SELECT manager_id, COUNT(*) AS team_size
-    FROM employees WHERE manager_id IS NOT NULL GROUP BY manager_id
+    FROM employee_managers WHERE manager_id IS NOT NULL GROUP BY manager_id
 ), den AS (
     SELECT t.manager_id, c.weekday, t.team_size, t.team_size * c.work_days AS total_work_days
     FROM team t CROSS JOIN cal c
 ), num AS (
-    SELECT e.manager_id, a.weekday,
+    SELECT em.manager_id, a.weekday,
            COUNT(*) FILTER (WHERE a.absence_type = 'Unplanned')                          AS unplanned_days,
            COUNT(*) FILTER (WHERE a.absence_type = 'Unplanned' AND NOT a.is_justified)   AS unjustified_days
     FROM absences a
     JOIN employees e USING (employee_id)
-    WHERE e.manager_id IS NOT NULL
-    GROUP BY e.manager_id, a.weekday
+    JOIN employee_managers em USING (employee_id)
+    WHERE em.manager_id IS NOT NULL
+    GROUP BY em.manager_id, a.weekday
 )
 SELECT den.manager_id,
        den.weekday,
@@ -171,4 +173,4 @@ SELECT weekday, reason, COUNT(*) AS absence_days,
        ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (PARTITION BY weekday), 1) AS share_of_weekday_pct
 FROM absences
 WHERE absence_type = 'Unplanned'
-GROUP BY weekday, reason;
+GROUP BY weekday, reason;! 

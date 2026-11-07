@@ -42,26 +42,28 @@ def expected_alerts(wl, ab, as_of, hours, weeks, leave_days):
     g = sub.groupby("employee_id")["hours"].agg(["count", "min"])
     hot = set(g[(g["count"] == weeks) & (g["min"] > hours)].index)
     lv = ab[(ab["absence_type"] == "Planned leave")
-            & (ab["absence_date"] > as_of - dt.timedelta(days=leave_days))
-            & (ab["absence_date"] <= as_of)]
+            & (ab["start_date"] > as_of - dt.timedelta(days=leave_days))
+            & (ab["start_date"] <= as_of)]
     return hot - set(lv["employee_id"])
 
 
 def main():
     with psycopg.connect("") as conn:
         emp = fetch(conn, "SELECT * FROM employees")
+        managers = fetch(conn, "SELECT employee_id, manager_id FROM employee_managers")
         dept = fetch(conn, "SELECT * FROM departments")
         wl = fetch(conn, "SELECT employee_id, week_start, hours_worked FROM weekly_workload")
-        ab = fetch(conn, "SELECT employee_id, absence_date, absence_type, reason, is_justified FROM absences")
+        ab = fetch(conn, "SELECT employee_id, start_date, end_date, absence_type, reason, is_justified FROM absences")
         wl["hours"] = wl["hours_worked"].astype(float)
         wl["week_start"] = pd.to_datetime(wl["week_start"]).dt.date
-        ab["absence_date"] = pd.to_datetime(ab["absence_date"]).dt.date
+        ab["start_date"] = pd.to_datetime(ab["start_date"]).dt.date
+        ab["end_date"] = pd.to_datetime(ab["end_date"]).dt.date
         n_emp = len(emp)
 
         # ------------------------------------------------------------ brief
         n_tables = fetch(conn, "SELECT COUNT(*) c FROM information_schema.tables "
                                "WHERE table_schema='public' AND table_type='BASE TABLE'")["c"][0]
-        check("Brief: 3 to 4 related tables", 3 <= n_tables <= 4, f"{n_tables} tables")
+        check("Brief: 3 to 5 related tables", 3 <= n_tables <= 5, f"{n_tables} tables")
         check("Brief: main table (absences) has 5,000-50,000 rows", 5000 <= len(ab) <= 50000, f"{len(ab):,} rows")
         n_fk = fetch(conn, "SELECT COUNT(*) c FROM information_schema.table_constraints "
                            "WHERE constraint_type='FOREIGN KEY' AND table_schema='public'")["c"][0]
@@ -133,10 +135,10 @@ def main():
         end = max(wl["week_start"]) + dt.timedelta(days=6)
         days = pd.bdate_range(start, end)
         wd_days = pd.Series(days.dayofweek).value_counts()          # 0=Mon .. 4=Fri
-        team = emp.dropna(subset=["manager_id"]).groupby("manager_id").size()
-        un_df = ab[ab["absence_type"] == "Unplanned"].merge(emp[["employee_id", "manager_id"]], on="employee_id")
+        team = managers.dropna(subset=["manager_id"]).groupby("manager_id").size()
+        un_df = ab[ab["absence_type"] == "Unplanned"].merge(managers, on="employee_id")
         un_df = un_df.dropna(subset=["manager_id"])
-        un_df["wd"] = pd.to_datetime(un_df["absence_date"]).dt.dayofweek
+        un_df["wd"] = pd.to_datetime(un_df["start_date"]).dt.dayofweek
         cnt = un_df.groupby(["manager_id", "wd"]).size()
         unj = un_df[~un_df["is_justified"]].groupby(["manager_id", "wd"]).size()
         rows = []
@@ -180,7 +182,7 @@ def main():
 
         # ------------------------------------------- realism of the data
         a_un = ab[ab["absence_type"] == "Unplanned"].copy()
-        a_un["month"] = pd.to_datetime(a_un["absence_date"]).dt.month
+        a_un["month"] = pd.to_datetime(a_un["start_date"]).dt.month
         wd_by_month = pd.Series(days.month).value_counts()
         def rate(months):
             return a_un["month"].isin(months).sum() / (n_emp * sum(wd_by_month.get(x, 0) for x in months))
@@ -199,11 +201,13 @@ def main():
               0.002 <= missing <= 0.015, f"{100 * missing:.2f}% of employee-weeks missing")
 
         # ------------------------------------------- integrity
-        bad_dept = fetch(conn, "SELECT COUNT(*) c FROM employees e JOIN employees m ON m.employee_id=e.manager_id "
+        bad_dept = fetch(conn, "SELECT COUNT(*) c FROM employee_managers em "
+                               "JOIN employees e ON e.employee_id=em.employee_id "
+                               "JOIN employees m ON m.employee_id=em.manager_id "
                                "WHERE m.dept_id <> e.dept_id")["c"][0]
         check("Integrity: every manager belongs to the same department as the team", bad_dept == 0, f"{bad_dept} violations")
         pre_hire = fetch(conn, "SELECT COUNT(*) c FROM absences a JOIN employees e USING (employee_id) "
-                               "WHERE a.absence_date < e.hire_date")["c"][0]
+                               "WHERE a.start_date < e.hire_date")["c"][0]
         check("Integrity: no absence before the hire date", pre_hire == 0, f"{pre_hire} violations")
 
     width = max(len(n) for n, _, _ in RESULTS)

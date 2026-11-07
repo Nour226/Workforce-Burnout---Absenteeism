@@ -6,7 +6,7 @@ PostgreSQL database, data generator, loader, KPI SQL and an automatic acceptance
 
 | Path | What it is |
 |---|---|
-| `sql/01_schema.sql` | 4 tables, keys, constraints, indexes (re-runnable) |
+| `sql/01_schema.sql` | 5 tables, keys, constraints, indexes (re-runnable) |
 | `scripts/generate_data.py` | Builds the 4 CSV files (hybrid: IBM HR base + synthetic rules), seeded |
 | `scripts/load_data.py` | Creates the schema, loads the CSVs with `COPY`, creates the KPI views |
 | `sql/02_kpi_queries.sql` | KPI 1, KPI 2, KPI 3 as views and one function |
@@ -35,11 +35,12 @@ Restore only the finished database instead: `createdb absenteeism && psql -d abs
 | Table | Rows | Columns |
 |---|---|---|
 | `departments` | 3 | dept_id, dept_name |
-| `employees` | 1,470 | employee_id, dept_id FK, manager_id FK (self), job_role, gender, age, overtime_flag, job_satisfaction (1-4), work_life_balance (1-4), distance_from_home, years_at_company, hire_date |
+| `employees` | 1,470 | employee_id, full_name, dept_id FK, job_role, gender, age, distance_from_home, hire_date |
+| `employee_managers` | 1,470 | employee_id FK, manager_id FK (self), separated from employee profile data |
 | `weekly_workload` | 76,093 | workload_id, employee_id FK, week_start (Monday), hours_worked, overtime_hours (computed: hours above 40) |
-| `absences` (main) | 39,039 | absence_id, employee_id FK, absence_date (Mon-Fri), weekday (computed), absence_type (`Planned leave` / `Unplanned`), reason, is_justified |
+| `absences` (main) | 39,039 | absence_id, employee_id FK, start_date, end_date, weekday (computed), absence_type (`Planned leave` / `Unplanned`), reason, is_justified |
 
-Period: 52 weeks, 2025-01-06 to 2026-01-04. One `absences` row = one absent working day.
+Period: 52 weeks, 2025-01-06 to 2026-01-04. Each generated absence row currently represents one working day, so `start_date` and `end_date` are equal; the schema supports multi-day ranges.
 
 ## 4. KPI matrix to SQL
 

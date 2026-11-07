@@ -15,10 +15,11 @@ ROOT = Path(__file__).resolve().parent.parent
 
 LOAD_ORDER = [  # parents first
     ("departments", "dept_id, dept_name"),
-    ("employees", "employee_id, dept_id, manager_id, job_role, gender, age, overtime_flag, "
-                  "job_satisfaction, work_life_balance, distance_from_home, years_at_company, hire_date"),
+    ("employees", "employee_id, full_name, dept_id, job_role, gender, age, "
+                  "distance_from_home, hire_date"),
+    ("employee_managers", "employee_id, manager_id"),
     ("weekly_workload", "workload_id, employee_id, week_start, hours_worked"),
-    ("absences", "absence_id, employee_id, absence_date, absence_type, reason, is_justified"),
+    ("absences", "absence_id, employee_id, start_date, end_date, absence_type, reason, is_justified"),
 ]
 
 

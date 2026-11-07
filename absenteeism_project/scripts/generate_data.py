@@ -37,6 +37,22 @@ N_WEEKS = 52
 N_DAYS = N_WEEKS * 5                         # working days Mon-Fri
 DEPARTMENTS = ["Human Resources", "Research & Development", "Sales"]
 
+FIRST_NAMES = [
+    "Mohamed", "Ahmed", "Ali", "Omar", "Youssef", "Ibrahim", "Yassine", "Adam",
+    "Bilal", "Anis", "Aymen", "Amine", "Salim", "Karim", "Tarek", "Yasser",
+    "Walid", "Hichem", "Hassan", "Hussein", "Mustapha", "Mourad", "Mehdi", "Ilyes",
+    "Zine", "Rayane", "Fares", "Sami", "Nour", "Abderrahmane", "Abdallah", "Hamza",
+    "Fatima", "Meriem", "Sara", "Nourhan", "Aya", "Liyane", "Roba", "Salma",
+    "Yasmine", "Rim", "Imane", "Amina", "Hiba", "Hanan", "Dina", "Lina",
+    "Rana", "Jana", "Safaa", "Sondos",
+]
+LAST_NAMES = [
+    "Algerian", "Al Arabi", "Ben Salah", "Ben Omar", "Ben Youssef", "Bouziane", "Boussaid",
+    "Hamdan", "Haddad", "Hammoudi", "Khaled", "Khelifa", "Derouiche", "Rahmani", "Razak",
+    "Zerrouki", "Saidi", "Cherif", "Saleh", "Taleb", "Abbas", "Abdelkader", "Attallah",
+    "Alioui", "Gharbi", "Ferhat", "Guesmi", "Laribi", "Mahmoudi", "Merzouk", "Mansouri",
+]
+
 ROLES = {
     "Research & Development": (
         ["Research Scientist", "Laboratory Technician", "Manufacturing Director",
@@ -90,6 +106,10 @@ def build_employees(ibm, rng):
     dept_id = {name: i + 1 for i, name in enumerate(sorted(ibm["Department"].unique()))}
     emp = pd.DataFrame({
         "employee_id": np.arange(1, n + 1),
+        "full_name": [
+            f"{FIRST_NAMES[i % len(FIRST_NAMES)]} {LAST_NAMES[i // len(FIRST_NAMES)]}"
+            for i in range(n)
+        ],
         "dept_name": ibm["Department"].values,
         "job_role": ibm["JobRole"].values,
         "gender": ibm["Gender"].values,
@@ -246,7 +266,9 @@ def build_absence_rows(emp, z, leave, absent, bdays, rng):
     ab["absence_date"] = bdays[ab["t"].values].date
     ab = ab.sort_values(["absence_date", "employee_id"]).reset_index(drop=True)
     ab.insert(0, "absence_id", np.arange(1, len(ab) + 1))
-    return ab[["absence_id", "employee_id", "absence_date", "absence_type", "reason", "is_justified"]]
+    ab["start_date"] = ab["absence_date"]
+    ab["end_date"] = ab["absence_date"]
+    return ab[["absence_id", "employee_id", "start_date", "end_date", "absence_type", "reason", "is_justified"]]
 
 
 def main():
@@ -281,13 +303,13 @@ def main():
     wl.insert(0, "workload_id", np.arange(1, len(wl) + 1))
 
     dept = pd.DataFrame({"dept_id": list(dept_id.values()), "dept_name": list(dept_id.keys())})
-    emp_out = emp[["employee_id", "dept_id", "manager_id", "job_role", "gender", "age",
-                   "overtime_flag", "job_satisfaction", "work_life_balance",
-                   "distance_from_home", "years_at_company", "hire_date"]].copy()
-    emp_out["manager_id"] = emp_out["manager_id"].astype("Int64")
+    managers = emp[["employee_id", "manager_id"]].copy()
+    managers["manager_id"] = managers["manager_id"].astype("Int64")
+    emp_out = emp[["employee_id", "full_name", "dept_id", "manager_id", "job_role", "gender",
+                   "age", "distance_from_home", "hire_date"]].copy()
+    emp_out = emp_out.drop(columns=["manager_id"])
 
     dept.to_csv(out / "departments.csv", index=False)
-    emp_out.to_csv(out / "employees.csv", index=False)
     wl.to_csv(out / "weekly_workload.csv", index=False)
     ab.to_csv(out / "absences.csv", index=False)
 
