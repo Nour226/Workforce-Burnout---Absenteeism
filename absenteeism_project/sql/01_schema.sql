@@ -1,9 +1,3 @@
--- =====================================================================
--- 01_schema.sql  |  Workforce Burnout & Employee Absenteeism
--- PostgreSQL 14+ | Owner: Role A (data engineer)
--- Re-runnable: drops and recreates everything.
--- =====================================================================
-
 DROP VIEW     IF EXISTS v_kpi3_reason_by_weekday, v_kpi3_by_manager, v_kpi3_by_weekday,
                         v_kpi3_unplanned_rate_by_manager_weekday,
                         v_kpi2_alerts_by_dept, v_kpi2_streak_history,
@@ -28,13 +22,6 @@ CREATE TABLE employees (
     age                smallint NOT NULL CHECK (age BETWEEN 18 AND 70),
     distance_from_home smallint NOT NULL CHECK (distance_from_home >= 0),
     hire_date          date     NOT NULL
-);
-
--- 3. employee manager relationships ---------------------------------
-CREATE TABLE employee_managers (
-    employee_id integer PRIMARY KEY REFERENCES employees (employee_id),
-    manager_id  integer REFERENCES employees (employee_id),
-    CHECK (manager_id IS DISTINCT FROM employee_id)
 );
 
 -- 4. weekly_workload --------------------------------------------------
@@ -65,7 +52,6 @@ CREATE TABLE absences (
 
 -- Indexes (foreign keys and the filters the KPI queries use) ------------
 CREATE INDEX ix_employees_dept       ON employees (dept_id);
-CREATE INDEX ix_employee_managers_manager ON employee_managers (manager_id);
 CREATE INDEX ix_workload_week        ON weekly_workload (week_start);
 CREATE INDEX ix_absences_start_date  ON absences (start_date);
 CREATE INDEX ix_absences_type_date   ON absences (absence_type, start_date);
