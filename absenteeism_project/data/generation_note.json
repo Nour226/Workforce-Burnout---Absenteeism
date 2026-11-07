@@ -1,0 +1,11 @@
+{
+  "employees_source": "STAND-IN with IBM structure (real file not supplied)",
+  "seed": 42,
+  "period": "2025-01-06 to 2026-01-04",
+  "rows": {
+    "departments": 3,
+    "employees": 1470,
+    "weekly_workload": 76093,
+    "absences": 39039
+  }
+}
