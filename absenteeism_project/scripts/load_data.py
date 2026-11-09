@@ -17,7 +17,6 @@ LOAD_ORDER = [  # parents first
     ("departments", "dept_id, dept_name"),
     ("employees", "employee_id, full_name, dept_id, job_role, gender, age, "
                   "distance_from_home, hire_date"),
-    ("employee_managers", "employee_id, manager_id"),
     ("weekly_workload", "workload_id, employee_id, week_start, hours_worked"),
     ("absences", "absence_id, employee_id, start_date, end_date, absence_type, reason, is_justified"),
 ]
@@ -40,7 +39,6 @@ def main():
                             cp.write(chunk)
                 cur.execute(f"SELECT COUNT(*) FROM {table}")
                 print(f"{table:16s} {cur.fetchone()[0]:>8,d} rows loaded")
-            cur.execute((ROOT / "sql" / "02_kpi_queries.sql").read_text())
         conn.commit()
         conn.autocommit = True
         conn.execute("ANALYZE")
@@ -48,4 +46,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main() 
