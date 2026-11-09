@@ -1,4 +1,4 @@
-# Workforce Burnout & Absenteeism – Analytical Solution
+# Workforce Burnout & Absenteeism :Analytical Solution
 
 **Workshop #01 Submission Package**  
 Audience: IT Head & General Executive  
