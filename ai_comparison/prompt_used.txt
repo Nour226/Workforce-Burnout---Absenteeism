@@ -1,0 +1,31 @@
+Exact prompt submitted to Claude 3.5 Sonnet (Anthropic) on 2025-11-08:
+
+---
+
+You are an expert BI dashboard designer. Create a complete executive dashboard specification for a Workforce Burnout & Absenteeism analysis project.
+
+Context:
+- Audience: IT Head and General Executive (non-technical decision makers)
+- Goal: Support decisions on workload redistribution, staffing adjustments, and wellbeing initiatives
+- Data available: departments, employees (~1470), absences (~39k events), weekly_workload (~76k rows)
+- Key KPIs already computed:
+  * Unplanned absence rate by department (Sales 25%, R&D 24.7%, HR 21.2%)
+  * Average weekly overtime per employee (Sales 3.40h, R&D 3.00h, HR 2.53h)
+  * Critical burnout employees: those with avg hours >48 or peak >58 AND annual leave <10 days (9 people)
+  * Monday/Friday elevation in unplanned absences
+
+Requirements for the dashboard:
+1. Clean executive visual style (KPI cards, clear charts, minimal text)
+2. At least 4 sections: Department Overview, Overtime, Burnout Risk, Absence Patterns
+3. Explicit link between each finding and a recommended action
+4. Use of color coding: green/amber/red for status
+5. Interactive filters (department, date range)
+
+Output:
+- Wireframe description of each page/section
+- Suggested chart types
+- Exact KPI definitions
+- Recommended actions text
+
+Do not generate code. Focus on the analytical story and decision support.
+---

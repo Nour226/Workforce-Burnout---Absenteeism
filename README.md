@@ -1,0 +1,122 @@
+# Workforce Burnout & Absenteeism – Analytical Solution
+
+**Workshop #01 Submission Package**  
+Audience: IT Head & General Executive  
+Goal: Support informed decisions on workload redistribution, staffing, and wellbeing initiatives.
+
+---
+
+## 1. Project Structure
+
+```
+Workforce-Burnout/
+│
+├── README.md
+├── .gitignore
+├── presentation/
+│   └── Executive_Presentation.pptx    ← we'll add it later
+├── sql/
+│   ├── 01_schema.sql                  ← database schema
+│   ├── 02_absence_by_department.sql
+│   ├── 03_overtime_annual_ranking.sql
+│   ├── 04_critical_burnout_employees.sql
+│   ├── 05_burnout_risk_by_department.sql
+│   ├── 06_unplanned_by_weekday.sql
+│   ├── department_overtime_ranking.sql
+│   ├── employees_critical_risk_zones.sql
+│   ├── absenteeism_patterns.sql
+│   └── absenteeism_dump.sql           ← full dump (optional restore)
+├── data/
+│   ├── departments.csv
+│   ├── employees.csv
+│   ├── absences.csv
+│   └── weekly_workload.csv
+├── scripts/
+│   ├── generate_data.py
+│   ├── load_data.py
+│   ├── verify_kpis.py
+├── dashboard/
+│   ├── app.py                         ← Streamlit executive portal
+│   └── requirements.txt
+└── ai_comparison/
+    ├── prompt_used.txt
+    └── comparison.md
+```
+---
+
+## 2. Quick Start – Dashboard (recommended for demo)
+
+```bash
+cd dashboard
+python -m venv .venv
+.venv\Scripts\activate  # for Windows
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+The dashboard loads the CSV data automatically. No database required for the interactive portal.
+
+Open the browser at the URL shown (usually http://localhost:8501).
+
+---
+
+## 3. Database Setup (PostgreSQL)
+
+### Prerequisites
+- PostgreSQL 14+ installed and running
+- `psql` available in PATH
+
+### Option A – Restore from dump (fastest)
+
+```bash
+createdb workforce_burnout
+psql -d workforce_burnout -f sql/absenteeism_dump.sql
+```
+
+### Option B – Schema + load from CSV
+
+```bash
+createdb workforce_burnout
+psql -d workforce_burnout -f sql/01_schema.sql
+
+# Then load data (Python)
+cd scripts
+pip install pandas psycopg2-binary
+python load_data.py   # edit connection string if needed
+```
+
+### Run analytical queries
+
+```bash
+psql -d workforce_burnout -f sql/02_absence_by_department.sql
+psql -d workforce_burnout -f sql/03_overtime_annual_ranking.sql
+psql -d workforce_burnout -f sql/04_critical_burnout_employees.sql
+# etc.
+```
+
+---
+
+## 4. Key Business Decisions Supported
+
+| Decision | Evidence provided by |
+|----------|----------------------|
+| Should we redistribute workload between departments? | Overtime ranking + unplanned absence rate by dept |
+| Should we adjust staffing during high-absence periods? | Monthly overtime & absence trends |
+| Which departments / individuals require further investigation? | Critical burnout list + department risk rates |
+| Should we introduce wellbeing initiatives? | Overtime–absence correlation + Monday/Friday pattern |
+
+---
+
+## 5. Three Key Findings (summary)
+
+1. **Sales & R&D carry the highest unplanned-absence burden** (25.0 % and 24.7 % vs 21.2 % in HR).
+2. **Sales operates under sustained elevated overtime** (3.40 h/week/employee – highest).
+3. **A small high-impact cohort (≈9 employees) is already in the critical burnout zone** (extreme hours + insufficient recovery leave).
+
+---
+
+## 6. AI Comparison
+
+See `ai_comparison/comparison.md` for the full critical comparison between the Claude-generated specification and our production Streamlit dashboard.
+
+---
