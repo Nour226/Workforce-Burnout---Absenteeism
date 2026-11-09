@@ -37,12 +37,12 @@ TEAL = "#2F6F7A"       # neutral accent
 SKY = "#8FB8BF"        # soft accent
 
 SERIF = "Fraunces, Georgia, serif"
-SANS = "'Inter', system-ui, -apple-system, sans-serif"
+SANS = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
 
 st.markdown(
     f"""
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap' );
 
     html, body, [class*="css"], .stApp {{
         font-family: {SANS};
@@ -134,16 +134,49 @@ st.markdown(
         padding: 0.7rem 0; background: transparent;
     }}
     [data-testid="stTabs"] button[role="tab"],
-    [data-testid="stTabs"] button[role="tab"] p {{
+    [data-testid="stTabs"] button[role="tab"] *,
+    div[data-baseweb="tab-list"] button[role="tab"],
+    div[data-baseweb="tab-list"] button[role="tab"] *,
+    div[data-baseweb="tab-list"] [data-baseweb="tab"],
+    div[data-baseweb="tab-list"] [data-baseweb="tab"] * {{
+        --text-color: #12313A !important;
+        --secondary-text-color: #12313A !important;
         color: #12313A !important;
+        -webkit-text-fill-color: #12313A !important;
+        text-shadow: 0 0 0 #12313A !important;
         font-family: {SANS} !important;
-        font-weight: 700 !important;
+        font-weight: 800 !important;
         font-size: 1rem !important;
         opacity: 1 !important;
     }}
+    [role="tab"],
+    [role="tab"] *,
+    [data-baseweb="tab"],
+    [data-baseweb="tab"] * {{
+        --text-color: #12313A !important;
+        --secondary-text-color: #12313A !important;
+        color: #12313A !important;
+        -webkit-text-fill-color: #12313A !important;
+        text-shadow: 0 0 0 #12313A !important;
+        opacity: 1 !important;
+    }}
     [data-testid="stTabs"] button[role="tab"][aria-selected="true"],
-    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] * {{
+    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] *,
+    div[data-baseweb="tab-list"] button[role="tab"][aria-selected="true"],
+    div[data-baseweb="tab-list"] button[role="tab"][aria-selected="true"] *,
+    div[data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"],
+    div[data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] * {{
         color: {TERRA} !important;
+        -webkit-text-fill-color: {TERRA} !important;
+        text-shadow: 0 0 0 {TERRA} !important;
+    }}
+    [role="tab"][aria-selected="true"],
+    [role="tab"][aria-selected="true"] *,
+    [data-baseweb="tab"][aria-selected="true"],
+    [data-baseweb="tab"][aria-selected="true"] * {{
+        color: {TERRA} !important;
+        -webkit-text-fill-color: {TERRA} !important;
+        text-shadow: 0 0 0 {TERRA} !important;
     }}
     div[data-baseweb="tab-highlight"] {{ background: {TERRA}; height: 3px; }}
     div[data-baseweb="tab-border"] {{ display: none; }}
@@ -318,7 +351,7 @@ emps_f = emps[emps["dept_name"].isin(selected_depts)]
 # Header
 # -----------------------------------------------------------------------------
 st.markdown('<div class="eyebrow">Executive briefing</div>', unsafe_allow_html=True)
-st.markdown('<div class="main-header">Workforce Burnout &amp; Absenteeism</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">Workforce Burnout And Absenteeism</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="sub-header">How overtime pressure, burnout risk and unplanned absence connect, '
     "and where acting early makes the biggest difference.</div>",
