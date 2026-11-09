@@ -1,6 +1,6 @@
---R3:EMPLOYEES IN RED ZONE
+
+--R3: EMPLOYEES IN RED ZONE (critical burnout count)
 WITH annual_work_metrics AS (
-    -- 1. Calcul des métriques de travail sur 52 semaines
     SELECT 
         employee_id,
         ROUND(AVG(hours_worked), 2) AS avg_weekly_hours,
@@ -9,7 +9,6 @@ WITH annual_work_metrics AS (
     GROUP BY employee_id
 ),
 annual_leave_metrics AS (
-    -- 2. Somme des jours de vacances (Annual Leave)
     SELECT 
         employee_id,
         COALESCE(SUM(end_date - start_date + 1), 0) AS total_vacation_days
@@ -27,8 +26,7 @@ WHERE (wm.avg_weekly_hours > 48 OR wm.max_weekly_hours > 58)
   AND COALESCE(lm.total_vacation_days, 0) < 10;
 
 
---R4:EMPLOYEES AT RISK LIST
-
+--R4: EMPLOYEES AT RISK LIST (detailed)
 WITH annual_work_metrics AS (
     SELECT 
         employee_id,
@@ -64,11 +62,7 @@ WHERE (wm.avg_weekly_hours > 48 OR wm.max_weekly_hours > 58)
 ORDER BY wm.avg_weekly_hours DESC;
 
 
-
-
-
-
---R5:BURNOUT RISK BETWEEN DEPARTMENTS
+--R5: BURNOUT RISK BETWEEN DEPARTMENTS
 WITH annual_work_metrics AS (
     SELECT 
         employee_id,
@@ -115,3 +109,4 @@ FROM departments d
 JOIN employee_risk_levels er ON d.dept_id = er.dept_id
 GROUP BY d.dept_id, d.dept_name
 ORDER BY critical_burnout_rate_pct DESC;
+

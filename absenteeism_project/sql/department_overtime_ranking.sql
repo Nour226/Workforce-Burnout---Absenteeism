@@ -1,4 +1,4 @@
---R1:ANNUEL
+--R1: ANNUAL OVERTIME BY DEPARTMENT
 SELECT
     DENSE_RANK() OVER (
         ORDER BY
@@ -21,7 +21,7 @@ SELECT
         2
     ) AS avg_weekly_overtime_per_emp,
 
-    -- CALCUL DU VOLUME ANNUEL EN TROP (Par rapport au seuil normal de 2h/sem/emp)
+    -- Volume annuel en trop (seuil normal de 2h/sem/emp)
     ROUND(
         SUM(GREATEST(0, w.hours_worked - 40)) - (COUNT(DISTINCT e.employee_id) * 52 * 2.00),
         2
@@ -29,10 +29,10 @@ SELECT
 
     CASE
         WHEN SUM(GREATEST(0, w.hours_worked - 40))
-             / NULLIF(COUNT(DISTINCT e.employee_id) * 52, 0) > 5
+             / NULLIF(COUNT(DISTINCT e.employee_id) * 52, 0) > 8.5
             THEN 'SURCHARGE CRITIQUE'
         WHEN SUM(GREATEST(0, w.hours_worked - 40))
-             / NULLIF(COUNT(DISTINCT e.employee_id) * 52, 0) BETWEEN 2 AND 5
+             / NULLIF(COUNT(DISTINCT e.employee_id) * 52, 0) > 5
             THEN 'CHARGE ELEVEE'
         ELSE 'CHARGE NORMALE'
     END AS department_status
@@ -47,17 +47,7 @@ GROUP BY d.dept_id, d.dept_name
 ORDER BY rank_overtime ASC;
 
 
-
-
-
-
-
-
-
-
-
-
---R2:TRIMESTRIEL
+--R2: QUARTERLY OVERTIME BY DEPARTMENT (thresholds aligned with annual)
 SELECT
     'Q' || EXTRACT(QUARTER FROM w.week_start) AS quarter,
 
@@ -83,7 +73,7 @@ SELECT
         2
     ) AS avg_weekly_overtime_per_emp,
 
-    -- CALCUL DU VOLUME TRIMESTRIEL EN TROP (Seuil normal : 2h/sem/emp sur 13 sem)
+    -- Volume trimestriel en trop (seuil normal : 2h/sem/emp sur 13 sem)
     ROUND(
         SUM(GREATEST(0, w.hours_worked - 40)) - (COUNT(DISTINCT e.employee_id) * 13 * 2.00),
         2
@@ -91,10 +81,10 @@ SELECT
 
     CASE
         WHEN SUM(GREATEST(0, w.hours_worked - 40))
-             / NULLIF(COUNT(DISTINCT e.employee_id) * 13, 0) > 5
+             / NULLIF(COUNT(DISTINCT e.employee_id) * 13, 0) > 8.5
             THEN 'SURCHARGE CRITIQUE'
         WHEN SUM(GREATEST(0, w.hours_worked - 40))
-             / NULLIF(COUNT(DISTINCT e.employee_id) * 13, 0) BETWEEN 2 AND 5
+             / NULLIF(COUNT(DISTINCT e.employee_id) * 13, 0) > 5
             THEN 'CHARGE ELEVEE'
         ELSE 'CHARGE NORMALE'
     END AS department_status
@@ -107,3 +97,4 @@ JOIN weekly_workload w
 
 GROUP BY EXTRACT(QUARTER FROM w.week_start), d.dept_id, d.dept_name
 ORDER BY quarter ASC, rank_overtime ASC;
+
