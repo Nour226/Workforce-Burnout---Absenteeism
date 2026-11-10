@@ -1,0 +1,8 @@
+[theme]
+base = "light"
+primaryColor = "#1F5FA8"
+backgroundColor = "#F5F9FE"
+secondaryBackgroundColor = "#E9F1FB"
+textColor = "#0E2747"
+font = "Poppins:https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+headingFont = "Poppins:https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"

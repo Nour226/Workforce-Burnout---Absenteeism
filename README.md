@@ -14,7 +14,7 @@ Workforce-Burnout/
 ├── README.md
 ├── .gitignore
 ├── presentation/
-│   └── Executive_Presentation.pptx    ← we'll add it later
+│   └── Executive_Presentation.pptx    
 ├── sql/
 │   ├── 01_schema.sql                  ← database schema
 │   ├── 02_absence_by_department.sql

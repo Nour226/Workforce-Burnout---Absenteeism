@@ -21,211 +21,233 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------------------------------
-# Palette: calm "care" tones — deep teal ink, warm paper, sage = healthy,
-# amber = watch, terracotta = risk. Chosen to feel human, not alarmist.
+# Palette: one blue family for charts and accents.
+# Red / amber are reserved ONLY for risk status (critical / warning).
 # -----------------------------------------------------------------------------
-INK = "#12313A"        # deep teal-ink (text, headings)
-MUTED = "#2C3E45"      # secondary text
-PAPER = "#F7F3EC"      # page background
-SAND = "#EDE6D8"       # sidebar / soft panels
-CARD = "#FFFDF9"       # card surface
-RULE = "#D9D0BE"       # hairlines
-SAGE = "#5E8F72"       # healthy / normal
-AMBER = "#E3A53A"      # warning
-TERRA = "#CC5A3A"      # critical
-TEAL = "#2F6F7A"       # neutral accent
-SKY = "#8FB8BF"        # soft accent
+INK = "#0E2747"        # deep navy (text, headings)
+MUTED = "#52657F"      # secondary text
+PAPER = "#F5F9FE"      # page background
+SAND = "#E9F1FB"       # sidebar / soft panels
+CARD = "#FFFFFF"       # card surface
+RULE = "#D5E2F2"       # hairlines
+GRID = "#E3ECF7"       # chart grid
+BLUE = "#1F5FA8"       # primary accent
+BLUE_DEEP = "#12407A"  # strong accent
+AZURE = "#3B82D6"      # mid blue
+SKY = "#9CC3F0"        # soft blue
+AMBER = "#E3A53A"      # status: warning only
+TERRA = "#D0533A"      # status: critical only
 
-SERIF = "Fraunces, Georgia, serif"
-SANS = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
+BLUE_SCALE = [SKY, AZURE, BLUE_DEEP]
+BLUE_SEQ = [BLUE, AZURE, INK, SKY, "#2A9DB8", "#5B7DB1", "#A9C6E8"]
+
+# One font family for the entire app (CSS, cards, and Plotly charts)
+FONT = "'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif"
 
 st.markdown(
     f"""
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap' );
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
 
-    html, body, [class*="css"], .stApp {{
-        font-family: {SANS};
-        color: {INK};
-    }}
-    .stApp {{ background: {PAPER}; }}
-    #MainMenu, footer, header[data-testid="stHeader"] {{ visibility: hidden; height: 0; }}
-    .block-container {{ padding-top: 2.2rem; padding-bottom: 3rem; max-width: 1280px; }}
+  html {{ color-scheme: light; }}
 
-    /* ---------- Sidebar ---------- */
-    section[data-testid="stSidebar"] {{
-        background: {SAND};
-        border-right: 1px solid {RULE};
-    }}
-    section[data-testid="stSidebar"] .block-container {{ padding-top: 2rem; }}
-    .brand {{
-        font-family: {SERIF};
-        font-size: 1.45rem;
-        font-weight: 600;
-        line-height: 1.15;
-        color: {INK};
-    }}
-    .brand small {{
-        display: block;
-        font-family: {SANS};
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: {TERRA};
-        margin-bottom: 0.35rem;
-    }}
-    .side-note {{
-        font-size: 0.85rem;
-        line-height: 1.55;
-        color: {MUTED};
-        border-top: 1px solid {RULE};
-        padding-top: 1rem;
-        margin-top: 1rem;
-    }}
-    .stMultiSelect span[data-baseweb="tag"] {{
-        background: {TEAL}; color: #fff; border-radius: 6px;
-    }}
+  /* ---------- One font everywhere (icons are left alone) ---------- */
+  html, body, .stApp, .stApp p, .stApp li, .stApp span, .stApp div, .stApp label,
+  .stApp button, .stApp input, .stApp textarea, .stApp select,
+  .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
+  .stApp td, .stApp th, .stApp small, .stApp dt, .stApp dd,
+  [data-testid="stMarkdownContainer"] *, [data-testid="stCaptionContainer"] *,
+  [data-baseweb="select"] *, [data-baseweb="popover"] *, [data-baseweb="input"] * {{
+      font-family: {FONT};
+  }}
+  [data-testid="stIconMaterial"], .material-icons, .material-symbols-rounded {{
+      font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+  }}
 
-    /* ---------- Header ---------- */
-    .eyebrow {{
-        font-size: 0.75rem; font-weight: 600; letter-spacing: 0.16em;
-        text-transform: uppercase; color: {TERRA}; margin-bottom: 0.5rem;
-    }}
-    .main-header {{
-        font-family: {SERIF};
-        font-size: 2.9rem; font-weight: 600; line-height: 1.08;
-        color: {INK}; margin: 0 0 0.6rem 0; letter-spacing: -0.01em;
-    }}
-    .sub-header {{
-        font-size: 1.05rem; line-height: 1.6; color: {MUTED};
-        max-width: 720px; margin-bottom: 1.8rem;
-    }}
+  .stApp {{ background: {PAPER}; color: {INK}; }}
+  #MainMenu, footer, header[data-testid="stHeader"] {{ visibility: hidden; height: 0; }}
+  .block-container {{ padding-top: 2.2rem; padding-bottom: 3rem; max-width: 1280px; }}
 
-    /* ---------- KPI strip ---------- */
-    .kpi {{
-        border-top: 3px solid {INK};
-        padding: 0.8rem 0.2rem 0.4rem 0;
-    }}
-    .kpi.alert {{ border-top-color: {TERRA}; }}
-    .kpi-label {{
-        font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em;
-        text-transform: uppercase; color: {MUTED};
-    }}
-    .kpi-value {{
-        font-family: {SERIF};
-        font-size: 2.6rem; font-weight: 600; line-height: 1.1; color: {INK};
-        margin: 0.25rem 0 0.1rem 0;
-    }}
-    .kpi.alert .kpi-value {{ color: {TERRA}; }}
-    .kpi-hint {{ font-size: 0.8rem; color: {MUTED}; }}
+  /* ---------- Sidebar ---------- */
+  section[data-testid="stSidebar"] {{
+      background: {SAND};
+      border-right: 1px solid {RULE};
+  }}
+  section[data-testid="stSidebar"] .block-container {{ padding-top: 2rem; }}
+  .brand {{
+      font-size: 1.4rem; font-weight: 700; line-height: 1.2; color: {INK};
+  }}
+  .brand small {{
+      display: block; font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: {BLUE}; margin-bottom: 0.35rem;
+  }}
 
-    /* ---------- Section titles ---------- */
-    h2, h3 {{ font-family: {SERIF} !important; color: {INK} !important; font-weight: 600 !important; }}
-    .section-intro {{ color: {MUTED}; font-size: 0.95rem; margin: -0.4rem 0 1.2rem 0; max-width: 760px; }}
-    .chart-title {{
-        font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em;
-        text-transform: uppercase; color: {MUTED}; margin: 0.6rem 0 0.2rem 0;
-    }}
+  /* Sidebar widgets: light blue look regardless of Streamlit theme */
+  [data-baseweb="tag"], [data-testid="stMultiSelectTag"] {{
+      background-color: {BLUE} !important; color: #fff !important; border-radius: 6px !important;
+  }}
+  [data-baseweb="tag"] * {{ color: #fff !important; fill: #fff !important; }}
+  div[data-baseweb="select"] > div,
+  div[data-baseweb="input"],
+  div[data-baseweb="base-input"] {{
+      background-color: {CARD} !important; color: {INK} !important;
+      border: 1px solid {RULE} !important; border-radius: 10px !important;
+  }}
+  div[data-baseweb="input"] input, div[data-baseweb="base-input"] input {{
+      color: {INK} !important; -webkit-text-fill-color: {INK} !important; background: transparent !important;
+  }}
+  div[data-baseweb="select"] svg, div[data-baseweb="input"] svg {{ color: {MUTED} !important; fill: {MUTED} !important; }}
+  [data-baseweb="tag"] svg {{ color: #fff !important; fill: #fff !important; }}
+  [data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] label {{
+      color: {INK} !important; font-weight: 600 !important; opacity: 1 !important;
+  }}
 
-    /* ---------- Tabs ---------- */
-    div[data-baseweb="tab-list"] {{ gap: 1.6rem; border-bottom: 1px solid {RULE}; }}
-    [data-testid="stTabs"] button[role="tab"] {{
-        padding: 0.7rem 0; background: transparent;
-    }}
-    [data-testid="stTabs"] button[role="tab"],
-    [data-testid="stTabs"] button[role="tab"] *,
-    div[data-baseweb="tab-list"] button[role="tab"],
-    div[data-baseweb="tab-list"] button[role="tab"] *,
-    div[data-baseweb="tab-list"] [data-baseweb="tab"],
-    div[data-baseweb="tab-list"] [data-baseweb="tab"] * {{
-        --text-color: #12313A !important;
-        --secondary-text-color: #12313A !important;
-        color: #12313A !important;
-        -webkit-text-fill-color: #12313A !important;
-        text-shadow: 0 0 0 #12313A !important;
-        font-family: {SANS} !important;
-        font-weight: 800 !important;
-        font-size: 1rem !important;
-        opacity: 1 !important;
-    }}
-    [role="tab"],
-    [role="tab"] *,
-    [data-baseweb="tab"],
-    [data-baseweb="tab"] * {{
-        --text-color: #12313A !important;
-        --secondary-text-color: #12313A !important;
-        color: #12313A !important;
-        -webkit-text-fill-color: #12313A !important;
-        text-shadow: 0 0 0 #12313A !important;
-        opacity: 1 !important;
-    }}
-    [data-testid="stTabs"] button[role="tab"][aria-selected="true"],
-    [data-testid="stTabs"] button[role="tab"][aria-selected="true"] *,
-    div[data-baseweb="tab-list"] button[role="tab"][aria-selected="true"],
-    div[data-baseweb="tab-list"] button[role="tab"][aria-selected="true"] *,
-    div[data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"],
-    div[data-baseweb="tab-list"] [data-baseweb="tab"][aria-selected="true"] * {{
-        color: {TERRA} !important;
-        -webkit-text-fill-color: {TERRA} !important;
-        text-shadow: 0 0 0 {TERRA} !important;
-    }}
-    [role="tab"][aria-selected="true"],
-    [role="tab"][aria-selected="true"] *,
-    [data-baseweb="tab"][aria-selected="true"],
-    [data-baseweb="tab"][aria-selected="true"] * {{
-        color: {TERRA} !important;
-        -webkit-text-fill-color: {TERRA} !important;
-        text-shadow: 0 0 0 {TERRA} !important;
-    }}
-    div[data-baseweb="tab-highlight"] {{ background: {TERRA}; height: 3px; }}
-    div[data-baseweb="tab-border"] {{ display: none; }}
+  /* ---------- Header ---------- */
+  .eyebrow {{
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: {BLUE}; margin-bottom: 0.5rem;
+  }}
+  .main-header {{
+      font-size: 2.8rem; font-weight: 800; line-height: 1.1;
+      color: {INK}; margin: 0 0 0.6rem 0; letter-spacing: -0.02em;
+  }}
+  .sub-header {{
+      font-size: 1.05rem; line-height: 1.65; color: {MUTED};
+      max-width: 720px; margin-bottom: 1.8rem;
+  }}
 
-    /* ---------- Finding & recommendations ---------- */
-    .finding {{
-        background: {CARD};
-        border: 1px solid {RULE};
-        border-radius: 14px;
-        padding: 1.2rem 1.4rem;
-        margin: 1.4rem 0 0.4rem 0;
-    }}
-    .finding .tag {{
-        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em;
-        text-transform: uppercase; color: {TERRA};
-    }}
-    .finding h4 {{
-        font-family: {SERIF}; font-size: 1.25rem; font-weight: 600;
-        margin: 0.3rem 0 0.4rem 0; color: {INK};
-    }}
-    .finding p {{ margin: 0; line-height: 1.6; color: #3E5258; }}
+  /* ---------- KPI strip ---------- */
+  .kpi {{
+      position: relative; overflow: hidden;
+      background: {CARD};
+      border: 1px solid {RULE};
+      border-radius: 18px;
+      padding: 1.1rem 1.2rem 1.15rem 1.2rem;
+      min-height: 168px;
+      box-shadow: 0 1px 2px rgba(14, 39, 71, 0.04), 0 6px 18px rgba(31, 95, 168, 0.06);
+      transition: transform .18s ease, box-shadow .18s ease;
+  }}
+  .kpi:hover {{
+      transform: translateY(-3px);
+      box-shadow: 0 2px 4px rgba(14, 39, 71, 0.05), 0 12px 26px rgba(31, 95, 168, 0.12);
+  }}
+  .kpi-icon {{
+      width: 2.5rem; height: 2.5rem; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      background: {SAND}; color: {BLUE}; margin-bottom: 0.9rem;
+  }}
+  .kpi-icon svg {{
+      width: 1.3rem; height: 1.3rem; fill: none; stroke: currentColor;
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }}
+  .kpi-label {{
+      font-size: 0.82rem; font-weight: 600; color: {MUTED};
+  }}
+  .kpi-value {{
+      font-size: 2.25rem; font-weight: 800; line-height: 1.1; color: {INK};
+      margin: 0.15rem 0 0.2rem 0; letter-spacing: -0.03em;
+  }}
+  .kpi-hint {{ font-size: 0.8rem; color: {MUTED}; }}
 
-    .rec {{
-        background: {CARD};
-        border: 1px solid {RULE};
-        border-radius: 14px;
-        padding: 1.4rem 1.5rem 1.3rem 1.5rem;
-        height: 100%;
-        min-height: 260px;
-    }}
-    .rec .num {{
-        font-family: {SERIF}; font-size: 2.4rem; font-weight: 600;
-        color: {SAGE}; line-height: 1;
-    }}
-    .rec h4 {{
-        font-family: {SERIF}; font-size: 1.2rem; font-weight: 600;
-        margin: 0.5rem 0 0.7rem 0; color: {INK}; line-height: 1.25;
-    }}
-    .rec dl {{ margin: 0; font-size: 0.9rem; line-height: 1.55; color: #3E5258; }}
-    .rec dt {{
-        font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em;
-        text-transform: uppercase; color: {MUTED}; margin-top: 0.6rem;
-    }}
-    .rec dd {{ margin: 0.1rem 0 0 0; }}
+  /* critical card: warm tint so it stands apart from the blue ones */
+  .kpi.alert {{
+      background: linear-gradient(160deg, #FFF6F3 0%, #FDE9E3 100%);
+      border-color: #F2CABF;
+  }}
+  .kpi.alert .kpi-icon {{ background: #FAD9D0; color: {TERRA}; }}
+  .kpi.alert .kpi-value {{ color: {TERRA}; }}
 
-    /* ---------- Misc ---------- */
-    div[data-testid="stDataFrame"] {{ border: 1px solid {RULE}; border-radius: 10px; overflow: hidden; }}
-    hr {{ border-color: {RULE}; }}
-    .foot {{ font-size: 0.78rem; color: {MUTED}; line-height: 1.6; }}
+  /* ---------- Section titles (neutral navy, numbered pill) ---------- */
+  .section-title {{
+      display: flex; align-items: center; gap: 0.8rem;
+      font-size: 2rem; font-weight: 800; line-height: 1.15;
+      letter-spacing: -0.02em; color: {INK};
+      margin: 2.6rem 0 0.6rem 0;
+      padding-top: 1.4rem; border-top: 1px solid {RULE};
+  }}
+  .section-num {{
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 2.4rem; height: 2.4rem; padding: 0 0.6rem;
+      border-radius: 999px; background: {INK}; color: #fff;
+      font-size: 0.95rem; font-weight: 600; letter-spacing: 0;
+  }}
+  .stApp h2, .stApp h3 {{ color: {INK} !important; font-weight: 700 !important; letter-spacing: -0.01em; }}
+  .section-intro {{ color: {MUTED}; font-size: 0.97rem; line-height: 1.6; margin: -0.2rem 0 1.2rem 0; max-width: 760px; }}
+  .chart-title {{
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: {MUTED}; margin: 0.6rem 0 0.2rem 0;
+  }}
+
+  /* ---------- Key finding ---------- */
+  .finding {{
+      background: {CARD};
+      border: 1px solid {RULE};
+      border-radius: 12px;
+      padding: 1.2rem 1.4rem;
+      margin: 1.4rem 0 0.4rem 0;
+  }}
+  .finding .tag {{
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: {BLUE};
+  }}
+  .finding h4 {{
+      font-size: 1.2rem; font-weight: 600; line-height: 1.3;
+      margin: 0.3rem 0 0.4rem 0; color: {INK};
+  }}
+  .finding p {{ margin: 0; font-size: 0.97rem; line-height: 1.65; color: {MUTED}; }}
+
+  /* ---------- Recommendation cards ---------- */
+  /* Recommendations: one clean table-style panel instead of four boxes */
+  .rec-table, .rec-table * {{ font-family: 'DM Sans', {FONT} !important; }}
+  .rec-table {{
+      background: {CARD};
+      border: 1px solid {RULE};
+      border-radius: 16px;
+      overflow: hidden;
+  }}
+  .rec-grid {{
+      display: grid;
+      grid-template-columns: 3.2rem 1.15fr 1.2fr 1.3fr 1.1fr;
+      column-gap: 1.6rem;
+      align-items: start;
+      padding: 1.25rem 1.6rem;
+  }}
+  .rec-header {{
+      background: {SAND};
+      padding-top: 0.75rem; padding-bottom: 0.75rem;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: {MUTED};
+      align-items: center;
+  }}
+  .rec-item {{ border-top: 1px solid {RULE}; }}
+  .rec-table .rec-no {{
+      font-family: {FONT} !important;
+      font-size: 1.5rem; font-weight: 800; line-height: 1;
+      color: {INK}; letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+  }}
+  .rec-title {{
+      font-size: 1.02rem; font-weight: 700; line-height: 1.3; color: {INK};
+  }}
+  .rec-cell {{ font-size: 0.9rem; line-height: 1.55; color: #33465F; }}
+  .rec-cell.benefit {{ color: {BLUE_DEEP}; font-weight: 600; }}
+  .rec-cell::before {{
+      content: attr(data-label); display: none;
+      font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: {MUTED}; margin-bottom: 0.2rem;
+  }}
+  @media (max-width: 900px) {{
+      .rec-header {{ display: none; }}
+      .rec-grid {{ grid-template-columns: 2.6rem 1fr; row-gap: 0.7rem; }}
+      .rec-no {{ grid-row: span 4; }}
+      .rec-cell::before {{ display: block; }}
+  }}
+
+  /* ---------- Misc ---------- */
+  div[data-testid="stDataFrame"] {{ border: 1px solid {RULE}; border-radius: 10px; overflow: hidden; }}
+  [data-testid="stCaptionContainer"] {{ color: {MUTED}; }}
+  hr {{ border-color: {RULE}; }}
 </style>
 """,
     unsafe_allow_html=True,
@@ -241,26 +263,48 @@ def style_fig(fig, height=360, legend=False):
         height=height,
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family=SANS, color=INK, size=13),
+        font=dict(family=FONT, color=INK, size=13),
         margin=dict(t=16, b=10, l=10, r=10),
         showlegend=legend,
         legend=dict(
             orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0,
-            title=None, font=dict(size=12),
+            title=None, font=dict(size=12, family=FONT),
         ),
-        hoverlabel=dict(bgcolor=INK, font=dict(color="#fff", family=SANS)),
+        hoverlabel=dict(bgcolor=INK, font=dict(color="#fff", family=FONT)),
         coloraxis_showscale=False,
     )
-    fig.update_xaxes(showgrid=False, linecolor=RULE, tickfont=dict(color=MUTED), title=None)
-    fig.update_yaxes(gridcolor="#E7DFCF", zeroline=False, tickfont=dict(color=MUTED))
+    fig.update_xaxes(showgrid=False, linecolor=RULE, tickfont=dict(color=MUTED, family=FONT), title=None)
+    fig.update_yaxes(gridcolor=GRID, zeroline=False, tickfont=dict(color=MUTED, family=FONT))
     return fig
 
 
-def kpi(label, value, hint="", alert=False):
+KPI_ICONS = {
+    "users": '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>'
+             '<path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    "calendar": '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'
+                '<path d="M10 14l4 4M14 14l-4 4"/>',
+    "clock": '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+    "alert": '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>'
+             '<path d="M12 9v4M12 17h.01"/>',
+    "file": '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>'
+            '<path d="M10 13l4 4M14 13l-4 4"/>',
+}
+
+
+def kpi(label, value, hint="", alert=False, icon="users"):
     cls = "kpi alert" if alert else "kpi"
+    svg = f'<svg viewBox="0 0 24 24" aria-hidden="true">{KPI_ICONS[icon]}</svg>'
     return (
-        f'<div class="{cls}"><div class="kpi-label">{label}</div>'
+        f'<div class="{cls}"><div class="kpi-icon">{svg}</div>'
+        f'<div class="kpi-label">{label}</div>'
         f'<div class="kpi-value">{value}</div><div class="kpi-hint">{hint}</div></div>'
+    )
+
+
+def section_title(num, text):
+    st.markdown(
+        f'<div class="section-title"><span class="section-num">{num}</span>{text}</div>',
+        unsafe_allow_html=True,
     )
 
 
@@ -275,8 +319,27 @@ def chart_title(text):
     st.markdown(f'<div class="chart-title">{text}</div>', unsafe_allow_html=True)
 
 
-RISK_COLORS = {"CRITICAL": TERRA, "WARNING": AMBER, "NORMAL": SAGE}
-RISK_SCALE = [SAGE, AMBER, TERRA]
+def rec_table(recs):
+    # Built without indentation or blank lines: Markdown would treat them as a code block.
+    html = (
+        '<div class="rec-table">'
+        '<div class="rec-grid rec-header"><div></div><div>Decision</div>'
+        "<div>Evidence</div><div>Action</div><div>Expected benefit</div></div>"
+    )
+    for num, title, ev, act, ben in recs:
+        html += (
+            '<div class="rec-grid rec-item">'
+            f'<div class="rec-no">{num}</div>'
+            f'<div class="rec-title">{title}</div>'
+            f'<div class="rec-cell" data-label="Evidence">{ev}</div>'
+            f'<div class="rec-cell" data-label="Action">{act}</div>'
+            f'<div class="rec-cell benefit" data-label="Expected benefit">{ben}</div>'
+            "</div>"
+        )
+    return html + "</div>"
+
+
+RISK_COLORS = {"CRITICAL": TERRA, "WARNING": AMBER, "NORMAL": BLUE}
 
 # -----------------------------------------------------------------------------
 # Data loading (cached)
@@ -331,12 +394,6 @@ with st.sidebar:
         max_value=date_max,
     )
 
-    st.markdown(
-        '<div class="side-note"><b>Made for</b> the IT Head and General Executive.<br><br>'
-        "Use it to decide on workload redistribution, staffing adjustments and wellbeing initiatives.</div>",
-        unsafe_allow_html=True,
-    )
-
 # Apply filters
 abs_f = absences[absences["dept_name"].isin(selected_depts)]
 if len(date_range) == 2:
@@ -387,13 +444,13 @@ risk = work_m.join(vac.rename("vac_days")).fillna(0)
 critical_mask = ((risk["avg_h"] > 48) | (risk["max_h"] > 58)) & (risk["vac_days"] < 10)
 critical_count = int(critical_mask.sum())
 
-cols = st.columns(5, gap="large")
+cols = st.columns(5, gap="medium")
 cards = [
-    kpi("Employees in scope", f"{total_emps:,}", "in selected departments"),
-    kpi("Unplanned absence", f"{unplanned_rate:.1f}%", "share of all absence days"),
-    kpi("Weekly overtime", f"{avg_ot:.2f} h", "average per employee"),
-    kpi("Critical burnout risk", f"{critical_count}", "need action now", alert=True),
-    kpi("Unjustified days", f"{unjustified_days:,}", "no valid reason on file"),
+    kpi("Employees in scope", f"{total_emps:,}", "in selected departments", icon="users"),
+    kpi("Unplanned absence", f"{unplanned_rate:.1f}%", "share of all absence days", icon="calendar"),
+    kpi("Weekly overtime", f"{avg_ot:.2f} h", "average per employee", icon="clock"),
+    kpi("Critical burnout risk", f"{critical_count}", "need action now", alert=True, icon="alert"),
+    kpi("Unjustified days", f"{unjustified_days:,}", "no valid reason on file", icon="file"),
 ]
 for c, html in zip(cols, cards):
     c.markdown(html, unsafe_allow_html=True)
@@ -401,14 +458,13 @@ for c, html in zip(cols, cards):
 st.markdown("<div style='height:1.4rem'></div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# Tabs
+# Sections (all on ONE scrolling page)
 # -----------------------------------------------------------------------------
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
-    ["Overview", "Overtime & workload", "Burnout risk", "Absence patterns", "Recommendations"]
-)
+tab1, tab2, tab3, tab4, tab5 = (st.container() for _ in range(5))
 
-# ========== TAB 1 ==========
+# ========== SECTION 1 ==========
 with tab1:
+    section_title("01", "Overview")
     st.subheader("Where absence hurts most")
     st.markdown(
         '<div class="section-intro">Unplanned absence is the clearest signal of operational disruption, '
@@ -441,13 +497,13 @@ with tab1:
             x="dept_name",
             y="unplanned_rate",
             color="unplanned_rate",
-            color_continuous_scale=RISK_SCALE,
+            color_continuous_scale=BLUE_SCALE,
             text="unplanned_rate",
         )
         fig.update_traces(texttemplate="%{text:.1f}%", textposition="outside", marker_line_width=0, cliponaxis=False)
         fig.update_yaxes(title=None, ticksuffix="%")
         fig.update_layout(bargap=0.35)
-        st.plotly_chart(style_fig(fig, 380), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 380), width="stretch")
 
     with c2:
         chart_title("Department detail")
@@ -461,7 +517,7 @@ with tab1:
                     "unplanned_rate": "Unplanned %",
                 }
             ),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             height=330,
         )
@@ -476,8 +532,9 @@ with tab1:
             f"({low['unplanned_rate']:.1f}%). These teams account for most of the disruption risk.",
         )
 
-# ========== TAB 2 ==========
+# ========== SECTION 2 ==========
 with tab2:
+    section_title("02", "Overtime &amp; workload")
     st.subheader("Overtime pressure")
     st.markdown(
         '<div class="section-intro">Average weekly overtime per employee. Up to 2 h is normal; '
@@ -504,7 +561,7 @@ with tab2:
             x="dept_name",
             y="avg_weekly_ot",
             color="status",
-            color_discrete_map={"Critical": TERRA, "Elevated": AMBER, "Normal": SAGE},
+            color_discrete_map={"Critical": TERRA, "Elevated": AMBER, "Normal": BLUE},
             category_orders={"status": ["Normal", "Elevated", "Critical"]},
             text="avg_weekly_ot",
         )
@@ -515,7 +572,7 @@ with tab2:
                       annotation_text="5 h critical", annotation_font_color=TERRA, annotation_position="top right")
         fig.update_yaxes(title=None, ticksuffix=" h")
         fig.update_layout(bargap=0.35)
-        st.plotly_chart(style_fig(fig, 390, legend=True), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 390, legend=True), width="stretch")
 
     with c2:
         chart_title("Total overtime hours by month")
@@ -526,12 +583,12 @@ with tab2:
             y="overtime",
             color="dept_name",
             markers=True,
-            color_discrete_sequence=[TERRA, TEAL, AMBER, SAGE, SKY, "#8C6A5D", "#A79A7A"],
+            color_discrete_sequence=BLUE_SEQ,
         )
         fig2.update_traces(line=dict(width=2.5), marker=dict(size=6))
         fig2.update_yaxes(title=None)
         fig2.update_xaxes(tickangle=-45)
-        st.plotly_chart(style_fig(fig2, 390, legend=True), use_container_width=True)
+        st.plotly_chart(style_fig(fig2, 390, legend=True), width="stretch")
 
     top = ot_summary.iloc[0]
     finding(
@@ -545,8 +602,9 @@ with tab2:
         + ". Staying above the 2 h threshold week after week is an early indicator of burnout.",
     )
 
-# ========== TAB 3 ==========
+# ========== SECTION 3 ==========
 with tab3:
+    section_title("03", "Burnout risk")
     st.subheader("Who is already in the red zone")
     st.markdown(
         '<div class="section-intro"><b>Critical</b> means average weekly hours above 48, or a peak week above 58, '
@@ -587,7 +645,7 @@ with tab3:
         fig.update_traces(marker_line_width=0)
         fig.update_yaxes(title="Employees")
         fig.update_layout(bargap=0.35)
-        st.plotly_chart(style_fig(fig, 370, legend=True), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 370, legend=True), width="stretch")
 
     critical_list = risk_tbl[risk_tbl["risk_level"] == "CRITICAL"].sort_values("avg_h", ascending=False)
     with c2:
@@ -603,7 +661,7 @@ with tab3:
                     "vac_days": "Leave days",
                 }
             ),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
             height=320,
             column_config={
@@ -619,8 +677,9 @@ with tab3:
         "Acting early on this group protects their health and keeps their teams running.",
     )
 
-# ========== TAB 4 ==========
+# ========== SECTION 4 ==========
 with tab4:
+    section_title("04", "Absence patterns")
     st.subheader("When and why people are absent")
     st.markdown(
         '<div class="section-intro">Timing and reasons behind unplanned absence, to separate genuine illness '
@@ -637,40 +696,72 @@ with tab4:
         wd = unp.groupby("weekday").agg(events=("absence_id", "count")).reset_index()
         wd["day_name"] = wd["weekday"].map(names)
         fig = px.bar(wd, x="day_name", y="events", color="events",
-                     color_continuous_scale=[SKY, TEAL, TERRA], text="events")
+                     color_continuous_scale=BLUE_SCALE, text="events")
         fig.update_traces(textposition="outside", marker_line_width=0, cliponaxis=False)
         fig.update_xaxes(categoryorder="array", categoryarray=list(names.values()))
         fig.update_yaxes(title=None)
         fig.update_layout(bargap=0.3)
-        st.plotly_chart(style_fig(fig, 350), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 350), width="stretch")
         st.caption("Mondays and Fridays stand out — typical of discretionary or recovery-related absence.")
 
     with c2:
         chart_title("Top unplanned absence reasons (days)")
         reasons = unp.groupby("reason")["days"].sum().sort_values(ascending=False).head(8).reset_index()
         fig = px.bar(reasons, x="days", y="reason", orientation="h", color="days",
-                     color_continuous_scale=[SKY, TEAL, TERRA], text="days")
+                     color_continuous_scale=BLUE_SCALE, text="days")
         fig.update_traces(texttemplate="%{text:.0f}", textposition="outside", marker_line_width=0, cliponaxis=False)
         fig.update_yaxes(categoryorder="total ascending", title=None)
         fig.update_xaxes(title=None)
         fig.update_layout(bargap=0.3)
-        st.plotly_chart(style_fig(fig, 350), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 350), width="stretch")
 
     chart_title("Unplanned absence days over time")
     trend = unp.groupby("month")["days"].sum().reset_index()
     fig = go.Figure(
         go.Scatter(
             x=trend["month"], y=trend["days"], mode="lines+markers",
-            line=dict(color=TERRA, width=3, shape="spline"),
-            marker=dict(size=7, color=TERRA),
-            fill="tozeroy", fillcolor="rgba(204,90,58,0.12)",
+            line=dict(color=BLUE, width=3, shape="spline"),
+            marker=dict(size=7, color=BLUE),
+            fill="tozeroy", fillcolor="rgba(31,95,168,0.12)",
         )
     )
     fig.update_yaxes(title=None)
-    st.plotly_chart(style_fig(fig, 260), use_container_width=True)
+    st.plotly_chart(style_fig(fig, 260), width="stretch")
 
-# ========== TAB 5 ==========
+    # ---- Unplanned absence reasons for EACH department ----
+    st.subheader("Absence reasons in each department")
+    st.markdown(
+        '<div class="section-intro">What drives unplanned absence in every department: '
+        "share of each department's unplanned absence days, by reason.</div>",
+        unsafe_allow_html=True,
+    )
+    rd = unp.groupby(["dept_name", "reason"])["days"].sum().reset_index()
+    rd["pct"] = (rd["days"] / rd.groupby("dept_name")["days"].transform("sum") * 100).round(1)
+
+    r1, r2 = st.columns([1, 1], gap="medium")
+    with r1:
+        chart_title("Share of unplanned absence days by reason, per department")
+        figr = px.bar(
+            rd, x="dept_name", y="pct", color="reason", barmode="group", text="pct",
+            color_discrete_sequence=BLUE_SEQ,
+        )
+        figr.update_traces(texttemplate="%{text:.1f}%", textposition="outside", marker_line_width=0, cliponaxis=False)
+        figr.update_yaxes(title=None, ticksuffix="%")
+        figr.update_layout(bargap=0.25)
+        st.plotly_chart(style_fig(figr, 400, legend=True), width="stretch")
+    with r2:
+        chart_title("Unplanned absence days (count)")
+        piv = rd.pivot(index="reason", columns="dept_name", values="days").fillna(0).astype(int)
+        piv["Total"] = piv.sum(axis=1)
+        st.dataframe(piv.sort_values("Total", ascending=False).reset_index().rename(columns={"reason": "Reason"}),
+                     width="stretch", hide_index=True)
+        top_r = rd.loc[rd.groupby("dept_name")["pct"].idxmax()]
+        for _, r in top_r.iterrows():
+            st.caption(f"**{r['dept_name']}**: main reason is {r['reason']} ({r['pct']:.1f}%)")
+
+# ========== SECTION 5 ==========
 with tab5:
+    section_title("05", "Recommendations")
     st.subheader("Decisions to take, and what to expect")
     st.markdown(
         '<div class="section-intro">Four actions, ordered by urgency. Each is tied to evidence '
@@ -679,8 +770,19 @@ with tab5:
     )
 
     # Evidence strings are built from the live data
-    hot_depts = " & ".join(dept_summary["dept_name"].head(2).tolist())
+    hot_depts = " &amp; ".join(dept_summary["dept_name"].head(2).tolist())
     ot_top = ot_summary.iloc[0]
+
+    # Live correlation between average overtime and unplanned absence days per employee
+    ot_emp = wl_f.groupby("employee_id")["overtime"].mean().rename("ot")
+    unp_emp = unp.groupby("employee_id")["days"].sum().rename("unp")
+    corr_df = pd.concat([ot_emp, unp_emp], axis=1).fillna({"unp": 0}).dropna()
+    corr_val = corr_df["ot"].corr(corr_df["unp"]) if len(corr_df) > 2 else np.nan
+    corr_text = (
+        f"Overtime and unplanned absence move together (r ≈ {corr_val:.2f} across employees)."
+        if pd.notna(corr_val)
+        else "Overtime and unplanned absence tend to move together."
+    )
 
     recs = [
         (
@@ -701,7 +803,7 @@ with tab5:
         (
             "03",
             "Pilot wellbeing programmes where pressure is highest",
-            "Overtime and unplanned absence move together (r ≈ 0.42 in validation).",
+            corr_text,
             "Stress-management workshops, flexible Fridays, and a clearer absence-justification process.",
             "Fewer Monday and Friday spikes and better engagement scores.",
         ),
@@ -714,29 +816,4 @@ with tab5:
         ),
     ]
 
-    for row in (recs[:2], recs[2:]):
-        cols = st.columns(2, gap="large")
-        for c, (num, title, ev, act, ben) in zip(cols, row):
-            c.markdown(
-                f"""
-                <div class="rec">
-                    <div class="num">{num}</div>
-                    <h4>{title}</h4>
-                    <dl>
-                        <dt>Evidence</dt><dd>{ev}</dd>
-                        <dt>Action</dt><dd>{act}</dd>
-                        <dt>Expected benefit</dt><dd>{ben}</dd>
-                    </dl>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        st.markdown("<div style='height:1.2rem'></div>", unsafe_allow_html=True)
-
-# Footer
-st.markdown("---")
-st.markdown(
-    '<div class="foot">Synthetic workforce dataset created for the workshop · '
-    "PostgreSQL + Python analysis · Streamlit + Plotly dashboard</div>",
-    unsafe_allow_html=True,
-)
+    st.markdown(rec_table(recs), unsafe_allow_html=True)
