@@ -434,7 +434,7 @@ unjustified_days = int(abs_f[~abs_f["is_justified"]]["days"].sum())
 vac = (
     absences[
         (absences["absence_type"] == "Planned leave")
-        & (absences["reason"].str.contains("Annual", case=False, na=False))
+        & (absences["reason"] == "Annual Leave")
     ]
     .groupby("employee_id")["days"]
     .sum()
@@ -538,7 +538,7 @@ with tab2:
     st.subheader("Overtime pressure")
     st.markdown(
         '<div class="section-intro">Average weekly overtime per employee. Up to 2 h is normal; '
-        "between 2 h and 5 h is elevated; above 5 h is critical.</div>",
+        "between 5 h and 8.5 h is elevated; <b>above 8.5 h is critical</b> (official thresholds from R1).</div>",
         unsafe_allow_html=True,
     )
 
@@ -549,7 +549,7 @@ with tab2:
     )
     ot_summary["avg_weekly_ot"] = (ot_summary["total_ot"] / (ot_summary["n_emps"] * 52)).round(2)
     ot_summary["status"] = ot_summary["avg_weekly_ot"].apply(
-        lambda x: "Critical" if x > 5 else ("Elevated" if x >= 2 else "Normal")
+        lambda x: "Critical" if x > 8.5 else ("Elevated" if x >= 5 else "Normal")
     )
     ot_summary = ot_summary.sort_values("avg_weekly_ot", ascending=False)
 
@@ -567,9 +567,11 @@ with tab2:
         )
         fig.update_traces(texttemplate="%{text:.2f} h", textposition="outside", marker_line_width=0, cliponaxis=False)
         fig.add_hline(y=2, line_dash="dot", line_color=MUTED, line_width=1,
-                      annotation_text="2 h normal", annotation_font_color=MUTED, annotation_position="top right")
-        fig.add_hline(y=5, line_dash="dot", line_color=TERRA, line_width=1,
-                      annotation_text="5 h critical", annotation_font_color=TERRA, annotation_position="top right")
+                annotation_text="2 h normal", annotation_font_color=MUTED, annotation_position="top right")
+        fig.add_hline(y=5, line_dash="dot", line_color=AMBER, line_width=1,
+            annotation_text="5 h elevated", annotation_font_color=AMBER, annotation_position="top right")
+        fig.add_hline(y=8.5, line_dash="dot", line_color=TERRA, line_width=1.5,
+            annotation_text="8.5 h critical", annotation_font_color=TERRA, annotation_position="top right")
         fig.update_yaxes(title=None, ticksuffix=" h")
         fig.update_layout(bargap=0.35)
         st.plotly_chart(style_fig(fig, 390, legend=True), width="stretch")

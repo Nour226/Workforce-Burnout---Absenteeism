@@ -1,9 +1,3 @@
--- ============================================================
--- ABSENTEEISM / OVERTIME / BURNOUT ANALYSIS SCRIPTS
---   SURCHARGE CRITIQUE : avg weekly OT > 8.5 h
---   CHARGE ELEVEE      : avg weekly OT > 5.0 h
---   CHARGE NORMALE     : otherwise
--- ============================================================
 
 --R1: ANNUAL OVERTIME BY DEPARTMENT
 SELECT

@@ -21,7 +21,6 @@ SELECT
         2
     ) AS avg_weekly_overtime_per_emp,
 
-    -- Volume annuel en trop (seuil normal de 2h/sem/emp)
     ROUND(
         SUM(GREATEST(0, w.hours_worked - 40)) - (COUNT(DISTINCT e.employee_id) * 52 * 2.00),
         2
